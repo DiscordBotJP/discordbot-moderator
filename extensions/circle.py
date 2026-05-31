@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from daug.utils.dpyexcept import excepter
 from daug.utils.dpylog import dpylogger
+from utils.ops_log import emit_component_error
 
 PERMISSION_OVERWRITE_ALL = discord.PermissionOverwrite(
     read_messages=False,
@@ -42,6 +43,14 @@ async def create_text(interaction: discord.Interaction):
 class CreateTextButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+
+    async def on_error(
+        self,
+        interaction: discord.Interaction,
+        error: Exception,
+        item: discord.ui.Item,
+    ) -> None:
+        await emit_component_error(interaction, error, item)
 
     @discord.ui.button(label='新規サークル作成', style=discord.ButtonStyle.green, custom_id='circle:create')
     @excepter
