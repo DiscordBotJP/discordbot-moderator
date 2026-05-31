@@ -5,11 +5,20 @@ from daug.utils import extract_role_mentions
 from daug.utils.dpyexcept import excepter
 from daug.utils.dpylog import dpylogger
 from daug.constants import COLOUR_EMBED_GRAY
+from utils.ops_log import emit_component_error
 
 
 class RoleSettingButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+
+    async def on_error(
+        self,
+        interaction: discord.Interaction,
+        error: Exception,
+        item: discord.ui.Item,
+    ) -> None:
+        await emit_component_error(interaction, error, item)
 
     @discord.ui.button(label='ロールを付ける', style=discord.ButtonStyle.blurple, custom_id='role:button:add')
     @excepter

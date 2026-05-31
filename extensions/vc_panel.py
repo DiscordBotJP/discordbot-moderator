@@ -3,6 +3,8 @@ from discord import app_commands
 from discord.ext import commands
 from daug.utils.dpyexcept import excepter
 from daug.utils.dpylog import dpylogger
+from utils.ops_log import emit_component_error
+from utils.ops_log import emit_exception_event
 
 MESSAGE_CREATE_VOICE = """新しくボイスチャンネルを作成しました。"""
 
@@ -47,6 +49,14 @@ async def create_private_thread_with_voice(interaction: discord.Interaction):
 class ThreadManageButtons(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+
+    async def on_error(
+        self,
+        interaction: discord.Interaction,
+        error: Exception,
+        item: discord.ui.Item,
+    ) -> None:
+        await emit_component_error(interaction, error, item)
 
     @discord.ui.button(label='VCと名前を同期する', row=0, style=discord.ButtonStyle.green, custom_id='voice_channel_thread:sync_name')
     @excepter
@@ -141,10 +151,35 @@ class EditRoomModal(discord.ui.Modal, title='VC設定を更新する'):
             embed=embed,
         )
 
+    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+        await emit_exception_event(
+            'command_error',
+            'Voice channel modal failed',
+            error,
+            actor=str(interaction.user.id) if interaction.user else None,
+            safe_details={
+                'guildId': interaction.guild_id,
+                'channelId': interaction.channel_id,
+            },
+        )
+        message = 'VC設定の更新中にエラーが発生しました。入力内容を確認してもう一度お試しください。'
+        if interaction.response.is_done():
+            await interaction.followup.send(message, ephemeral=True)
+        else:
+            await interaction.response.send_message(message, ephemeral=True)
+
 
 class VoiceChannelConfigButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+
+    async def on_error(
+        self,
+        interaction: discord.Interaction,
+        error: Exception,
+        item: discord.ui.Item,
+    ) -> None:
+        await emit_component_error(interaction, error, item)
 
     @discord.ui.button(label='入室中のVC設定を更新する', emoji='🔧', row=0, style=discord.ButtonStyle.blurple, custom_id='voice_channel:update')
     @excepter
@@ -188,6 +223,23 @@ class VoiceChannelPanelCog(commands.Cog):
     @commands.Cog.listener()
     @excepter
     async def on_message(self, message: discord.Message):
+        try:
+            await self._handle_thread_menu_message(message)
+        except Exception as error:
+            await emit_exception_event(
+                'command_error',
+                'Thread menu message failed',
+                error,
+                actor=str(message.author.id) if message.author else None,
+                safe_details={
+                    'guildId': message.guild.id if message.guild else None,
+                    'channelId': message.channel.id if message.channel else None,
+                    'messageId': message.id,
+                },
+            )
+            raise
+
+    async def _handle_thread_menu_message(self, message: discord.Message):
         if message.author.bot:
             return
         if message.author.system:
