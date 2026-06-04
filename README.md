@@ -48,7 +48,7 @@ private thread 内で「メニュー」「ボタン」などの本文に反応�
 `OPS_LOG_HUB_URL` と `OPS_LOG_HUB_KEY` が設定されている場合のみ、以下のイベントを ops-log-hub に送信します。
 
 - `startup`: Bot 起動完了
--- `config_error`: extension 読み込み / command 同期の失敗
+- `config_error`: extension 読み込み / command 同期の失敗
 - `command_error`: slash command、ボタン、モーダル、thread menu message の失敗
 
 ログには message content や secret 値は含めず、guild/channel/message ID など調査に必要な最小限の情報だけを入れます。
