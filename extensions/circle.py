@@ -75,7 +75,5 @@ class CircleCog(commands.Cog):
         await interaction.response.send_message('メンバーがサークル用TCを作成できるボタンを設置します', ephemeral=True)
         await interaction.channel.send(view=CreateTextButton())
 
-
-
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(CircleCog(bot))

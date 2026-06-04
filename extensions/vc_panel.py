@@ -61,7 +61,7 @@ class ThreadManageButtons(discord.ui.View):
     @discord.ui.button(label='VCと名前を同期する', row=0, style=discord.ButtonStyle.green, custom_id='voice_channel_thread:sync_name')
     @excepter
     @dpylogger
-    async def _invite_voice_members_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+    async def _sync_voice_name_button(self, interaction: discord.Interaction, button: discord.ui.Button):
         await interaction.response.defer(ephemeral=True)
         if interaction.user.voice is None:
             await interaction.followup.send('VCに入ってから操作してください', ephemeral=True)
@@ -136,7 +136,7 @@ class EditRoomModal(discord.ui.Modal, title='VC設定を更新する'):
     async def on_submit(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
         payload = {}
-        embed=discord.Embed()
+        embed = discord.Embed()
         payload['name'] = self.name.value
         embed.add_field(name='部屋名', value=self.name.value)
         if self.status.value:
