@@ -22,13 +22,13 @@ Discord サーバー運営向けの補助パネルを提供する既存 Bot で�
 
 ## 環境変数
 
-| Name | Required | Description |
+| 変数 | 必須 | 説明 |
 | --- | --- | --- |
-| `DISCORD_BOT_TOKEN` | Yes | Discord Bot token |
-| `OPS_LOG_HUB_URL` | No | ops-log-hub ingest endpoint |
-| `OPS_LOG_HUB_KEY` | No | ops-log-hub ingest key |
-| `OPS_LOG_PROJECT` | No | ops-log project name. Default: `discordbot-moderator` |
-| `OPS_LOG_ENVIRONMENT` | No | `production` / `development` など |
+| `DISCORD_BOT_TOKEN` | はい | Discord Bot token |
+| `OPS_LOG_HUB_URL` | いいえ | ops-log-hub 送信先 |
+| `OPS_LOG_HUB_KEY` | いいえ | ops-log-hub 送信用 key |
+| `OPS_LOG_PROJECT` | いいえ | ops-log project 名。既定値: `discordbot-moderator` |
+| `OPS_LOG_ENVIRONMENT` | いいえ | `production` / `development` など |
 
 ## 必要権限・Intents
 
@@ -43,17 +43,17 @@ Discord サーバー運営向けの補助パネルを提供する既存 Bot で�
 
 private thread 内で「メニュー」「ボタン」などの本文に反応するため Message Content Intent が必要です。VC入室状態を使うため Voice States Intent も必要です。
 
-## Ops logging
+## 運用ログ
 
 `OPS_LOG_HUB_URL` と `OPS_LOG_HUB_KEY` が設定されている場合のみ、以下のイベントを ops-log-hub に送信します。
 
 - `startup`: Bot 起動完了
-- `config_error`: extension load / command sync の失敗
+- `config_error`: extension 読み込み / command 同期の失敗
 - `command_error`: slash command、ボタン、モーダル、thread menu message の失敗
 
 ログには message content や secret 値は含めず、guild/channel/message ID など調査に必要な最小限の情報だけを入れます。
 
-## Local run
+## ローカル実行
 
 ```bash
 cp .env.example .env
